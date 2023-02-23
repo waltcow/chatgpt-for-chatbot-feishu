@@ -144,8 +144,8 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 					return
 				}
 
-				if err := conversation.IsQuestionAsked(request.Header.EventID); err != nil {
-					logger.Warnf("duplicated event(id: %s): %v", request.Header.EventID, err)
+				if err := conversation.IsQuestionAsked(request.Event.Message.MessageID); err != nil {
+					logger.Warnf("duplicated message(id: %s): %v", request.Event.Message.MessageID, err)
 					return
 				}
 
@@ -153,7 +153,7 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 				err = retry.Retry(func() error {
 
 					answer, err = conversation.Ask([]byte(question), &chatgpt.ConversationAskConfig{
-						ID:   request.Header.EventID,
+						ID:   request.Event.Message.MessageID,
 						User: user,
 					})
 					if err != nil {
@@ -163,6 +163,7 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 
 					return nil
 				}, 5, 3*time.Second)
+
 				if err != nil {
 					logger.Errorf("failed to get answer: %v", err)
 					msgType, content, err := mc.

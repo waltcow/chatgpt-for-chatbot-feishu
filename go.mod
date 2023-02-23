@@ -72,6 +72,6 @@ require (
 
 // replace github.com/go-zoox/chatbot-feishu => ../chatbot-feishu
 
-// replace github.com/go-zoox/feishu => ../feishu
+replace github.com/go-zoox/feishu => github.com/waltcow/feishu v1.3.5
 
 // replace github.com/go-zoox/logger => ../logger
