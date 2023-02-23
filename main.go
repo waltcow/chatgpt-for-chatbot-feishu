@@ -36,6 +36,12 @@ func main() {
 				Required: true,
 			},
 			&cli.StringFlag{
+				Name:     "bot-open-id",
+				Usage:    "Feishu Bot ID",
+				EnvVars:  []string{"BOT_OPEN_ID"},
+				Required: true,
+			},
+			&cli.StringFlag{
 				Name:     "app-secret",
 				Usage:    "Feishu App SECRET",
 				EnvVars:  []string{"APP_SECRET"},
@@ -98,6 +104,7 @@ func main() {
 			ChatGPTAPIKey:     ctx.String("chatgpt-api-key"),
 			AppID:             ctx.String("app-id"),
 			AppSecret:         ctx.String("app-secret"),
+			BotOpenID:         ctx.String("bot-open-id"),
 			EncryptKey:        ctx.String("encrypt-key"),
 			VerificationToken: ctx.String("verification-token"),
 			ReportURL:         ctx.String("report-url"),

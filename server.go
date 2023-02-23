@@ -11,11 +11,9 @@ import (
 	"github.com/go-zoox/debug"
 
 	"github.com/go-zoox/core-utils/fmt"
-	"github.com/go-zoox/feishu"
 	mc "github.com/go-zoox/feishu/message/content"
 
 	chatgpt "github.com/go-zoox/chatgpt-client"
-	feishuBot "github.com/go-zoox/feishu/bot"
 	feishuEvent "github.com/go-zoox/feishu/event"
 	"github.com/go-zoox/logger"
 	"github.com/go-zoox/retry"
@@ -27,6 +25,7 @@ type FeishuBotConfig struct {
 	ChatGPTAPIKey     string
 	AppID             string
 	AppSecret         string
+	BotOpenID         string
 	EncryptKey        string
 	VerificationToken string
 	//
@@ -61,36 +60,6 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 		return fmt.Errorf("failed to create chatgpt client: %v", err)
 	}
 
-	bot := feishu.New(&feishu.Config{
-		AppID:     cfg.AppID,
-		AppSecret: cfg.AppSecret,
-		BaseURI:   cfg.FeishuBaseURI,
-	})
-	var botInfo *feishuBot.GetBotInfoResponse
-
-	tryToGetBotInfo := func() {
-		for {
-			if botInfo != nil {
-				break
-			}
-
-			logger.Infof("trying to get bot info ...")
-			botInfo, err = bot.Bot().GetBotInfo()
-			if err != nil {
-				logger.Errorf("failed to get bot info: %v", err)
-				return
-			}
-
-			logger.Infof("Bot Name: %s", botInfo.AppName)
-			logger.Infof("Feishu Bot Online ...")
-			time.Sleep(3 * time.Second)
-		}
-	}
-
-	go func() {
-		tryToGetBotInfo()
-	}()
-
 	if debug.IsDebugMode() {
 		fmt.PrintJSON(map[string]interface{}{
 			"cfg": cfg,
@@ -101,6 +70,7 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 	logger.Infof("###### Settings START #######")
 	logger.Infof("Serve at PORT: %d", cfg.Port)
 	logger.Infof("Serve at API_PATH: %s", cfg.APIPath)
+	logger.Infof("Bot OpenID API: %s", cfg.BotOpenID)
 	logger.Infof("###### Settings END #######")
 
 	if cfg.SiteURL != "" {
@@ -118,13 +88,6 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 		AppSecret: cfg.AppSecret,
 	}, func(contentString string, request *feishuEvent.EventRequest, reply func(content string, msgType ...string) error) error {
 		// fmt.PrintJSON(request)
-		if botInfo == nil {
-			logger.Infof("trying to get bot info ...")
-			botInfo, err = bot.Bot().GetBotInfo()
-			if err != nil {
-				return fmt.Errorf("failed to get bot info: %v", err)
-			}
-		}
 
 		user := request.Sender().SenderID.UserID
 
@@ -151,8 +114,8 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 		if request.IsGroupChat() {
 			// @
 			if ok := regexp.Match("^@_user_1", textMessage); ok {
-				for _, metion := range request.Event.Message.Mentions {
-					if metion.Key == "@_user_1" && metion.ID.OpenID == botInfo.OpenID {
+				for _, mention := range request.Event.Message.Mentions {
+					if mention.Key == "@_user_1" && mention.ID.OpenID == cfg.BotOpenID {
 						question = textMessage[len("@_user_1 "):]
 						break
 					}
