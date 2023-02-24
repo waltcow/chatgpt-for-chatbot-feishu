@@ -104,11 +104,20 @@ $ docker-compose up -d
 # 支持 Go-Zoox 中间件
 ```
 
-## 高级配置（可选）
+## 高级环境配置（可选）
+* `API_PATH`: 自定义 WebHook 路径
+* `ENCRYPT_KEY`: 飞书事件密钥
+* `VERIFICATION_TOKEN`: 飞书 Challenge 校验 Token
+* `SITE_URL`: 自定义域名地址
+* `OPENAI_MODEL`: 自定义 OpenAI 模型
+* `FEISHU_BASE_URI`: 私有部署飞书地址
+* `CHATGPT_CONTEXT_MESSAGE`: 自定义上下文消息
+* `CHATGPT_LANGUAGE`: 自定义机器人初始语言
 * `TUNNEL_ENABLE`: 启用 Ngrok
 * `TUNNEL_TYPE`: 指定隧道类型，可选项：ngrok | cpolar
 * `AUTH_TOKEN`: 付费用户 Auth Token
 * `SUBDOMAIN`: 指定固定子域名
+* `LOGS_DIR`: 自定义日志目录
 
 ## 飞书应用配置和 OpenAI 相关步骤
 
@@ -183,10 +192,24 @@ $ docker-compose up -d
 
 ### 更新日志
 
+* 2023.02.23 修复 CI Docker Image Tag latest
+
+* 2023.02.23 事件支持 encrypt key (#31)
+
+* 2023.02.23 Challenge 支持 verification token (#31)
+
+* 2023.02.24 支持命令模式，为角色扮演命令做好准备 (#29)
+
+* 2023.02.23 修复飞书由于网络原因会重发消息，应该可以从 chatbot 端忽略已经重复的消息 (#28)
+
+* 2023.02.23 支持自定义上下文，使用 env CHATGPT_CONTEXT_MESSAGE (#22)
+
+* 2023.02.23 支持自定义初始语言，如果不指定，默认是英文，使用 env CHATGPT_LANGUAGE (#22)
+
 * 2023.02.22 修复从零开始创建机器人的时候需要飞书 Challenge 但是启动服务需要开通机器人，从而造成死循环，无法启动服务
 
-* 2023.02.22 支持私有部署的飞书
+* 2023.02.22 支持私有部署的飞书 (#17)
 
-* 2023.02.22 支持自定义 OpenAI 模型
+* 2023.02.22 支持自定义 OpenAI 模型 (#16)
 
 * 2023.02.20 内置支持 tunnel，目前支持 cpolar，ngrok，一键部署版本支持通过 `zmicro service upgrade chatgpt-for-chatbot-feishu` 快速升级，按提示操作即可，使用更加简单
