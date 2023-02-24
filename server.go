@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-zoox/chatgpt-for-chatbot-feishu/client"
 	"strings"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/go-zoox/core-utils/fmt"
 	mc "github.com/go-zoox/feishu/message/content"
 
-	chatgpt "github.com/go-zoox/chatgpt-client"
 	feishuEvent "github.com/go-zoox/feishu/event"
 	"github.com/go-zoox/logger"
 	"github.com/go-zoox/retry"
@@ -40,6 +40,8 @@ type FeishuBotConfig struct {
 	ChatGPTLanguage string
 	//
 	LogsDir string
+
+	ProxyAPIServer string
 }
 
 func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
@@ -55,11 +57,13 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 		return fmt.Errorf("failed to setup logs: %v", err)
 	}
 
-	client, err := chatgpt.New(&chatgpt.Config{
+	client, err := chatgptclient.New(&chatgptclient.Config{
 		APIKey:               cfg.ChatGPTAPIKey,
 		ConversationContext:  cfg.ChatGPTContext,
 		ConversationLanguage: cfg.ChatGPTLanguage,
+		ProxyAPIServer:       cfg.ProxyAPIServer,
 	})
+
 	if err != nil {
 		return fmt.Errorf("failed to create chatgpt client: %v", err)
 	}
@@ -143,9 +147,6 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 						break
 					}
 				}
-			} else if ok := regexp.Match("^/chatgpt\\s+", textMessage); ok {
-				// command: /chatgpt
-				question = textMessage[len("/chatgpt "):]
 			}
 		} else if request.IsP2pChat() {
 			question = textMessage
@@ -162,10 +163,10 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 			logger.Infof("%s 问：%s", user, question)
 			var err error
 
-			conversation, err := client.GetOrCreateConversation(request.ChatID(), &chatgpt.ConversationConfig{
+			conversation, err := client.GetOrCreateConversation(request.ChatID(), &chatgptclient.ConversationConfig{
 				MaxMessages: 50,
-				Model:       cfg.OpenAIModel,
 			})
+
 			if err != nil {
 				logger.Errorf("failed to get or create conversation by ChatID %s", request.ChatID())
 				return
@@ -179,7 +180,7 @@ func ServeFeishuBot(cfg *FeishuBotConfig) (err error) {
 			var answer []byte
 			err = retry.Retry(func() error {
 
-				answer, err = conversation.Ask([]byte(question), &chatgpt.ConversationAskConfig{
+				answer, err = conversation.Ask([]byte(question), &chatgptclient.ConversationAskConfig{
 					ID:   request.Event.Message.MessageID,
 					User: user,
 				})

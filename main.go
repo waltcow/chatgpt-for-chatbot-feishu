@@ -73,6 +73,11 @@ func main() {
 				EnvVars: []string{"OPENAI_MODEL"},
 			},
 			&cli.StringFlag{
+				Name:    "chatgpt-proxy-server",
+				Usage:   "Custom chatgpt proxy server",
+				EnvVars: []string{"CHATGPT_PROXY_SERVER"},
+			},
+			&cli.StringFlag{
 				Name:    "feishu-base-uri",
 				Usage:   "Custom feishu base uri for selfhosted Feishu",
 				EnvVars: []string{"FEISHU_BASE_URI"},
@@ -113,6 +118,7 @@ func main() {
 			FeishuBaseURI:     ctx.String("feishu-base-uri"),
 			ChatGPTContext:    ctx.String("chatgpt-context"),
 			ChatGPTLanguage:   ctx.String("chatgpt-language"),
+			ProxyAPIServer:    ctx.String("chatgpt-proxy-server"),
 		})
 	})
 
