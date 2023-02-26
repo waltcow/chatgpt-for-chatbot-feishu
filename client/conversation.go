@@ -26,6 +26,10 @@ type conversation struct {
 
 	LastMessageId  string
 	ConversationId string
+	// bing parts
+	InvocationId          string
+	ClientId              string
+	ConversationSignature string
 }
 
 // ConversationConfig is the configuration for creating a new Conversation.
@@ -109,6 +113,10 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 	if c.ConversationId != "" {
 		askConf.ConversationId = c.ConversationId
 		askConf.ParentMessageId = c.LastMessageId
+		// bing parts
+		askConf.ClientId = c.ClientId
+		askConf.ConversationSignature = c.ConversationSignature
+		askConf.InvocationId = c.InvocationId
 	}
 
 	result, err := c.client.Ask(question, askConf)
@@ -126,6 +134,12 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 
 	c.LastMessageId = result.MessageId
 	c.ConversationId = result.ConversationId
+
+	if result.IsBingResponse() {
+		c.ConversationSignature = result.ConversationSignature
+		c.InvocationId = result.InvocationId
+		c.ClientId = result.ClientId
+	}
 
 	return []byte(result.Response), nil
 }

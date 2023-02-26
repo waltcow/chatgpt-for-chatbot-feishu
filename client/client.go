@@ -38,6 +38,10 @@ type AskConfig struct {
 	Question        string `json:"question"`
 	ConversationId  string `json:"conversation_id"`
 	ParentMessageId string `json:"parent_message_id"`
+
+	ClientId              string `json:"client_id"`
+	ConversationSignature string `json:"conversation_signature"`
+	InvocationId          string `json:"invocation_id"`
 }
 
 // New creates a new ChatGPT Client.
