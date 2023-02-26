@@ -41,7 +41,7 @@ type AskConfig struct {
 
 	ClientId              string `json:"client_id"`
 	ConversationSignature string `json:"conversation_signature"`
-	InvocationId          string `json:"invocation_id"`
+	InvocationId          int    `json:"invocation_id"`
 }
 
 // New creates a new ChatGPT Client.

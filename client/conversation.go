@@ -27,7 +27,7 @@ type conversation struct {
 	LastMessageId  string
 	ConversationId string
 	// bing parts
-	InvocationId          string
+	InvocationId          int
 	ClientId              string
 	ConversationSignature string
 }
