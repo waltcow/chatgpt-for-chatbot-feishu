@@ -7,11 +7,11 @@ type ChatGPTBrowserResponse struct {
 	MessageId      string `json:"messageId"`
 
 	// bing parts
-	InvocationId          string `json:"invocationId"`
+	InvocationId          int    `json:"invocationId"`
 	ClientId              string `json:"clientId"`
 	ConversationSignature string `json:"conversationSignature"`
 }
 
 func (response *ChatGPTBrowserResponse) IsBingResponse() bool {
-	return response.InvocationId != "" && response.ClientId != "" && response.ConversationSignature != ""
+	return response.InvocationId > 0 && response.ClientId != "" && response.ConversationSignature != ""
 }
