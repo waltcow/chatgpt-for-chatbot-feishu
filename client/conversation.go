@@ -136,6 +136,7 @@ func (c *conversation) Ask(question []byte, cfg ...*ConversationAskConfig) (answ
 	c.ConversationId = result.ConversationId
 
 	if result.IsBingResponse() {
+		logger.Infof("bing response: %+v", result)
 		c.ConversationSignature = result.ConversationSignature
 		c.InvocationId = result.InvocationId
 		c.ClientId = result.ClientId

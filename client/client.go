@@ -77,6 +77,15 @@ func (c *client) Ask(question []byte, cfg ...*AskConfig) (r *ChatGPTBrowserRespo
 		if cfg[0].ParentMessageId != "" {
 			requestBody["parentMessageId"] = cfg[0].ParentMessageId
 		}
+		if cfg[0].ClientId != "" {
+			requestBody["clientId"] = cfg[0].ClientId
+		}
+		if cfg[0].ConversationSignature != "" {
+			requestBody["conversationSignature"] = cfg[0].ConversationSignature
+		}
+		if cfg[0].InvocationId != 0 {
+			requestBody["invocationId"] = cfg[0].InvocationId
+		}
 	}
 
 	marshalStr, err := json.Marshal(requestBody)
